@@ -63,7 +63,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: GCE-1
+        working-directory: newgithubvm
 
     steps:
     # Checkout the repository to the GitHub Actions runner
