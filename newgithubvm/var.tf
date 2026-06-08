@@ -1,13 +1,12 @@
 variable "project_id" {
-type = string
+  type    = string
+  default = "project-a0d9d954-ea3e-4055-bea"
 }
 
 variable "region" {
-type = string
-default = "us-central1"
+  default = "us-central1"
 }
 
 variable "zone" {
-type = string
-default = "us-central1-a"
+  default = "us-central1-a"
 }
