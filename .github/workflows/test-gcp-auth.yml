@@ -63,6 +63,7 @@ jobs:
     defaults:
       run:
         shell: bash
+        working-directory: GCE-1
 
     steps:
     # Checkout the repository to the GitHub Actions runner
@@ -84,6 +85,7 @@ jobs:
           
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
+
    
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
