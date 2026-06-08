@@ -1,60 +1,49 @@
-terraform {
-required_providers {
-google = {
-source  = "hashicorp/google"
-version = "~> 7.0"
-}
-}
+resource "google_compute_network" "vpc" {
+name = "github-actions-vpc"
+auto_create_subnetworks = false
 }
 
-provider "google" {
-project = "project-a0d9d954-ea3e-4055-bea"
-region  = "us-central1"
-zone    = "us-central1-a"
+resource "google_compute_subnetwork" "subnet" {
+name = "github-actions-subnet"
+ip_cidr_range = "10.10.0.0/24"
+region = "us-central1"
+network = google_compute_network.vpc.id
+}
+
+resource "google_compute_firewall" "allow_http_ssh" {
+name = "allow-http-ssh"
+network = google_compute_network.vpc.name
+
+allow {
+protocol = "tcp"
+ports = ["22", "80"]
+}
+
+source_ranges = ["0.0.0.0/0"]
 }
 
 resource "google_compute_instance" "vm_instance" {
-name         = "github-actions-vm"
+name = "github-actions-vm"
 machine_type = "e2-micro"
-zone         = "us-central1-a"
+zone = "us-central1-a"
 
 boot_disk {
 initialize_params {
 image = "debian-cloud/debian-12"
-size  = 10
+size = 10
 }
 }
 
 network_interface {
-network = "default"
-
-```
+network = google_compute_network.vpc.id
+subnetwork = google_compute_subnetwork.subnet.id
 access_config {
 }
-```
 
-}
-
-tags = ["http-server"]
-
-metadata_startup_script = <<-EOF
-#!/bin/bash
-apt-get update
-apt-get install -y nginx
-systemctl enable nginx
-systemctl start nginx
-EOF
-
-labels = {
-environment = "dev"
-owner       = "aishwarya"
 }
 }
 
-output "instance_name" {
-value = google_compute_instance.vm_instance.name
-}
-
-output "external_ip" {
-value = google_compute_instance.vm_instance.network_interface[0].access_config[0].nat_ip
+resource "google_compute_disk" "extra_disk" {
+  name = "extra-disk"
+  zone = "us-central1-a"
 }
